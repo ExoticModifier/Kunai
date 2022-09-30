@@ -1,0 +1,227 @@
+--Kunai Spammer Script
+ 
+local Kunai = Instance.new("Tool")
+Kunai.Parent = game.Players.LocalPlayer.Backpack
+Kunai.RequiresHandle = false
+Kunai.Name = "Kunai"
+Kunai.TextureId = "rbxassetid://1615395277"
+ 
+Kunai.Activated:connect(function()
+    wait();
+local l__LocalPlayer__1 = game.Players.LocalPlayer;
+while l__LocalPlayer__1.Character == nil do
+    wait();
+end;
+local l__Character__2 = l__LocalPlayer__1.Character;
+while l__Character__2:FindFirstChild("Humanoid") == nil do
+    wait();
+end;
+local l__Humanoid__3 = l__Character__2:FindFirstChild("Humanoid");
+while l__Character__2:FindFirstChild("HumanoidRootPart") == nil do
+    wait();
+end;
+local l__Torso__4 = l__Character__2:FindFirstChild("Torso");
+game.Players.LocalPlayer.Backpack.Kunai:WaitForChild("Throw");
+game:GetService("ContentProvider"):PreloadAsync({ game.Players.LocalPlayer.Backpack.Kunai:FindFirstChild("Throw") });
+enabled = true;
+local l__Parent__1 = game.Players.LocalPlayer.Backpack.Kunai;
+local u2 = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false);
+local u3 = {
+    Size = UDim2.new(1, 0, 1, 0), 
+    ImageTransparency = 1, 
+    Position = UDim2.new(0, 0, 0, 0)
+};
+local u4 = l__Humanoid__3:LoadAnimation(game.Players.LocalPlayer.Backpack.Kunai:FindFirstChild("Throw"));
+local u5 = 0;
+local function u6()
+    local v5 = Instance.new("Part");
+    v5.Material = "Fabric";
+    v5.BrickColor = BrickColor.new("Black");
+    v5.CanCollide = false;
+    v5.Size = Vector3.new(1.6, 1.6, 4);
+    v5.TopSurface = "Smooth";
+    v5.BottomSurface = "Smooth";
+    v5.CustomPhysicalProperties = PhysicalProperties.new(0.01, 0, 0, 0, 0);
+    l__Parent__1.Mesh:Clone().Parent = v5;
+    local v6 = Instance.new("Attachment");
+    v6.Position = Vector3.new(0, -0.4, 0.5);
+    v6.Parent = v5;
+    local v7 = v6:clone();
+    v7.Position = Vector3.new(0, 0.4, 0.5);
+    v7.Parent = v5;
+    local v8 = l__Parent__1.Trail:clone();
+    v8.Parent = v5;
+    v8.Attachment0 = v6;
+    v8.Attachment1 = v7;
+    local v9 = Instance.new("Sound");
+    v9.Name = "WooshSound";
+    v9.Volume = 0.4;
+    v9.EmitterSize = 10;
+    v9.MaxDistance = 400;
+    v9.SoundId = "http://www.roblox.com/asset/?id=28166510";
+    v9.Pitch = math.random(8, 12) / 10;
+    v9.Parent = v5;
+    local v10 = Instance.new("Sound");
+    v10.Name = "HitSound";
+    v10.EmitterSize = 10;
+    v10.MaxDistance = 240;
+    v10.Volume = 0.15;
+    v10.Pitch = math.random(10, 14) / 10;
+    v10.SoundId = "http://www.roblox.com/asset/?id=91154471";
+    v10.Parent = v5;
+    local v11 = Instance.new("BodyForce");
+    v11.Name = "AntiGrav";
+    v11.force = Vector3.new(0, v5:GetMass() * 196.2, 0);
+    v11.Parent = v5;
+    return v5;
+end;
+local l__RemoteTriggers__7 = game.ReplicatedStorage.RemoteTriggers;
+local function u8(p1)
+    local v12 = game.ReplicatedStorage.HitSpark:clone();
+    v12.Shimmer.ImageLabel.ImageColor3 = l__Parent__1.Trail.Color.Keypoints[1].Value;
+    v12.Sparks.Color = l__Parent__1.Trail.Color;
+    v12.Position = p1;
+    v12.Parent = game.Workspace;
+    game.Debris:AddItem(v12, 1);
+    game:GetService("TweenService"):Create(v12.Shimmer.ImageLabel, u2, u3):Play();
+    wait(0.13);
+    v12.Sparks.Enabled = false;
+end;
+local function u9(p2)
+    u4:Play(0);
+    u5 = u5 + 1;
+    local v13 = u6();
+    v13.Name = l__LocalPlayer__1.Name .. tostring(u5);
+    v13.CFrame = CFrame.new(l__Torso__4.CFrame * Vector3.new(0, 1, -1));
+    v13.CFrame = CFrame.new(v13.Position, p2) * CFrame.new(0, 0, 1);
+    v13.Velocity = v13.CFrame.lookVector * 245;
+    local v14 = Instance.new("ObjectValue");
+    v14.Name = "creator";
+    v14.Value = l__LocalPlayer__1;
+    v14.Parent = v13;
+    l__RemoteTriggers__7.KunaiThrow:FireServer(v13.Position, p2, u5, l__Parent__1);
+    v13.Parent = game.Workspace._Projectiles;
+    game.Debris:AddItem(v13, 15);
+    v13.WooshSound:Play();
+    coroutine.resume(coroutine.create(function()
+        v13.ChildRemoved:connect(function(p3)
+            if v13 ~= nil and p3.Name == "ManualWeld" then
+                if v13:FindFirstChild("AntiGrav") then
+                    v13:FindFirstChild("AntiGrav"):Destroy();
+                end;
+                v13.CanCollide = true;
+            end;
+        end);
+        local u10 = function(p4, p5)
+            p4.Velocity = Vector3.new(0, 0, 0);
+            if p4:FindFirstChild("Trail") then
+                p4.Trail.Enabled = false;
+            end;
+            u10 = Instance.new("ManualWeld");
+            u10.Part0 = p4;
+            u10.Part1 = p5;
+            u10.C1 = p4.CFrame:inverse() * p5.CFrame;
+            u10.Parent = p4;
+        end;
+        local u11 = false;
+        v13.Touched:connect(function(p6)
+            if p6 == nil then
+                return;
+            end;
+            if p6.Parent == nil then
+                return;
+            end;
+            if u11 then
+                return;
+            end;
+            local v15 = nil;
+            if p6.Parent:FindFirstChild("Humanoid") then
+                v15 = p6.Parent:FindFirstChild("Humanoid");
+            end;
+            if p6.Parent:IsA("Hat") and p6.Parent.Parent:FindFirstChild("Humanoid") then
+                v15 = p6.Parent.Parent:FindFirstChild("Humanoid");
+            end;
+            if v15 ~= nil then
+                if v14.Value == nil then
+                    return;
+                end;
+                if v14.Value.Character == nil then
+                    return;
+                end;
+                if v15.Parent ~= v14.Value.Character then
+                    u11 = true;
+                    if v13:FindFirstChild("HitSound") then
+                        v13.HitSound.SoundId = "http://www.roblox.com/asset/?id=89343281";
+                        v13.HitSound.Volume = 0.8;
+                        v13.HitSound.MaxDistance = 500;
+                        v13.HitSound.EmitterSize = 10;
+                        v13.HitSound:Play();
+                    end;
+                    u10(v13, p6);
+                    l__RemoteTriggers__7.KunaiAttach:FireServer(v13.Name, v13.CFrame, p6);
+                    l__RemoteTriggers__7.Bolster:FireServer(v15, l__Parent__1, u5, v13.Position);
+                    return;
+                end;
+            elseif p6.CanCollide == true then
+                u11 = true;
+                if v13:FindFirstChild("HitSound") then
+                    v13.HitSound:Play();
+                end;
+                if p6.Anchored then
+                    v13.Velocity = Vector3.new(0, 0, 0);
+                    v13.Anchored = true;
+                else
+                    u10(v13, p6);
+                end;
+                l__RemoteTriggers__7.KunaiAttach:FireServer(v13.Name, v13.CFrame, p6);
+                spawn(function()
+                    u8(v13.Position);
+                end);
+            end;
+        end);
+        wait(2);
+        if not u11 then
+            v13:Destroy();
+        else
+            wait(4);
+            v13:Destroy();
+        end;
+    end));
+end;
+Kunai.Equipped:connect(function(p7)
+    p7.Icon = "rbxasset://textures\\GunCursor.png";
+    p7.Button1Down:connect(function()
+        if not enabled or l__Humanoid__3.Health <= 0 then
+            return;
+        end;
+        enabled = false;
+        p7.Icon = "rbxasset://textures\\GunWaitCursor.png";
+        u9(p7.Hit.p);
+        wait(0.001);
+        enabled = true;
+        p7.Icon = "rbxasset://textures\\GunCursor.png";
+    end);
+end);
+    
+end)
+local Animation = Instance.new("Animation")
+ 
+Animation.AnimationId = "rbxassetid://290950053"
+Animation.Parent = game.Players.LocalPlayer.Backpack.Kunai
+ 
+local Trail = Instance.new("Trail")
+ 
+Trail.LightEmission = 0.8
+Trail.Lifetime = 0.3
+Trail.MaxLength = 60
+Trail.MinLength = 0.1
+Trail.Name = "Trail"
+Trail.Parent = game.Players.LocalPlayer.Backpack.Kunai
+ 
+local Mesh = Insance.new("SpecialMesh")
+ 
+Mesh.MeshId ="rbxassetid://45728702"
+Mesh.Scale = "2.6, 2.6, 2.6"
+Mesh.VertexColor = "1, 1, 1"
+Mesh.Meshtype = "FileMesh"
+ 
